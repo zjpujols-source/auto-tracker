@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1e293b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>AutoTracker - Control de Vehículo</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="logo-icon">🚗</span>
+        <div>
+          <h1 class="app-title">AutoTracker</h1>
+          <p class="app-subtitle" data-i18n="appSubtitle">Control de Mantenimiento y Gasolina</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="langToggleBtn" class="lang-toggle-btn" aria-label="Cambiar idioma">
+          <span id="langIcon">🇺🇸</span> <span id="langLabel">EN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Navigation Tabs (Always visible on all screens) -->
+    <nav class="top-nav-tabs">
+      <button class="tab-btn active" data-tab="tab-vehicle">
+        <span>🚗</span> <span data-i18n="navVehicle">Vehículo</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-maintenance">
+        <span>🛠️</span> <span data-i18n="navMaintenance">Servicios</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-fuel">
+        <span>⛽</span> <span data-i18n="navFuel">Gasolina</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-settings">
+        <span>⚙️</span> <span data-i18n="navSettings">Ajustes</span>
+      </button>
+    </nav>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastMessage" class="toast-banner" role="alert" aria-live="polite"></div>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- TAB 1: VEHICLE OVERVIEW -->
+      <section id="tab-vehicle" class="tab-pane active" role="tabpanel">
+        <div class="card vehicle-card">
+          <div class="vehicle-card-header">
+            <div class="vehicle-title-wrap">
+              <span class="badge-year" id="carYear">2022</span>
+              <h2 class="vehicle-name" id="carName">Toyota Corolla</h2>
+            </div>
+            <button id="editVehicleBtn" class="btn-icon" data-i18n-title="editVehicle" title="Editar Vehículo">
+              ✏️
+            </button>
+          </div>
+
+          <div class="vehicle-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label" data-i18n="vinLabel">VIN / No. Serie</span>
+              <span class="meta-value mono" id="carVin">4T1B11HK5MU123456</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label" data-i18n="currentMileageLabel">Millas Actuales</span>
+              <span class="meta-value highlight" id="carMileage">45,200 mi</span>
+            </div>
+          </div>
+
+          <!-- Quick Mileage Update -->
+          <form id="quickMileageForm" class="quick-odometer-box">
+            <label for="quickMileageInput" class="input-hint" data-i18n="quickOdometerHint">Actualizar odómetro rápido:</label>
+            <div class="input-group">
+              <input type="number" id="quickMileageInput" inputmode="numeric" min="0" placeholder="Ej. 45500" required>
+              <button type="submit" class="btn-primary-sm" data-i18n="updateBtn">Actualizar</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Reminders / Status Cards -->
+        <h3 class="section-heading" data-i18n="maintenanceStatusHeading">Estado de Mantenimiento</h3>
+        <div class="status-cards-grid">
+          <!-- Oil Status -->
+          <div class="card status-card" id="oilStatusCard">
+            <div class="status-icon-wrap oil">🛢️</div>
+            <div class="status-info">
+              <div class="status-title-row">
+                <span class="status-name" data-i18n="oilChangeTitle">Cambio de Aceite</span>
+                <span class="status-badge" id="oilBadge">Al día</span>
+              </div>
+              <p class="status-detail" id="oilDetail">Próximo en: 2,800 mi</p>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="oilProgress" style="width: 44%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tires Status -->
+          <div class="card status-card" id="tireStatusCard">
+            <div class="status-icon-wrap tire">🛞</div>
+            <div class="status-info">
+              <div class="status-title-row">
+                <span class="status-name" data-i18n="tireChangeTitle">Rotación / Llantas</span>
+                <span class="status-badge" id="tireBadge">Al día</span>
+              </div>
+              <p class="status-detail" id="tireDetail">Próximo en: 3,500 mi</p>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="tireProgress" style="width: 30%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Summary Stats -->
+        <h3 class="section-heading" data-i18n="fuelPerformanceHeading">Rendimiento de Gasolina</h3>
+        <div class="card fuel-quick-summary">
+          <div class="metric-row">
+            <div class="metric-box">
+              <span class="metric-label" data-i18n="avgMpgLabel">Promedio MPG</span>
+              <span class="metric-val" id="summaryAvgMpg">32.1</span>
+              <span class="metric-sub" data-i18n="mpgUnit">millas / galón</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-box">
+              <span class="metric-label" data-i18n="avgGpmLabel">Galón por Milla</span>
+              <span class="metric-val" id="summaryAvgGpm">0.031</span>
+              <span class="metric-sub" data-i18n="gpmUnit">gal / mi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY PREVIEW (Directly on Dashboard) -->
+        <div class="recent-section-header">
+          <h3 class="section-heading" data-i18n="recentServicesHeading">Últimos Servicios Realizados</h3>
+          <button class="link-btn switch-to-tab" data-target-tab="tab-maintenance" data-i18n="viewAllBtn">Ver todos →</button>
+        </div>
+        <div id="recentMaintenancePreview" class="cards-list">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="recent-section-header" style="margin-top: 18px;">
+          <h3 class="section-heading" data-i18n="recentFuelHeading">Últimas Cargas de Gasolina</h3>
+          <button class="link-btn switch-to-tab" data-target-tab="tab-fuel" data-i18n="viewAllBtn">Ver todas →</button>
+        </div>
+        <div id="recentFuelPreview" class="cards-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 2: MAINTENANCE SERVICES -->
+      <section id="tab-maintenance" class="tab-pane" role="tabpanel">
+        <div class="tab-header-row">
+          <div>
+            <h2 class="tab-title" data-i18n="maintenanceTitle">Servicios y Mantenimientos</h2>
+            <p class="tab-desc" data-i18n="maintenanceSubtitle">Historial de cambios de aceite, llantas y más</p>
+          </div>
+          <button id="addMaintBtn" class="btn-primary" data-i18n="addServiceBtn">+ Nuevo Servicio</button>
+        </div>
+
+        <div class="filter-bar">
+          <select id="maintFilter" class="select-input">
+            <option value="all" data-i18n="filterAll">Todos los servicios</option>
+            <option value="oil" data-i18n="serviceOil">Cambio de Aceite</option>
+            <option value="tires" data-i18n="serviceTires">Cambio / Rotación de Llantas</option>
+            <option value="brakes" data-i18n="serviceBrakes">Frenos</option>
+            <option value="general" data-i18n="serviceGeneral">Mantenimiento General</option>
+            <option value="other" data-i18n="serviceOther">Otro</option>
+          </select>
+        </div>
+
+        <div id="maintenanceList" class="cards-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 3: FUEL LOG -->
+      <section id="tab-fuel" class="tab-pane" role="tabpanel">
+        <div class="tab-header-row">
+          <div>
+            <h2 class="tab-title" data-i18n="fuelLogTitle">Registro de Gasolina</h2>
+            <p class="tab-desc" data-i18n="fuelLogSubtitle">Cargas de combustible y consumo galón/milla</p>
+          </div>
+          <button id="addFuelBtn" class="btn-primary" data-i18n="addFuelBtn">+ Cargar Gasolina</button>
+        </div>
+
+        <!-- Fuel Summary Banner -->
+        <div class="card fuel-banner">
+          <div class="fuel-stat">
+            <span class="stat-num" id="statTotalGallons">33.0</span>
+            <span class="stat-lbl" data-i18n="totalGallons">Galones Totales</span>
+          </div>
+          <div class="fuel-stat">
+            <span class="stat-num" id="statAvgMpg">32.1</span>
+            <span class="stat-lbl">MPG</span>
+          </div>
+          <div class="fuel-stat">
+            <span class="stat-num" id="statAvgGpm">0.031</span>
+            <span class="stat-lbl" data-i18n="galPerMile">Galón / Milla</span>
+          </div>
+        </div>
+
+        <div id="fuelList" class="cards-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 4: SETTINGS & BACKUP -->
+      <section id="tab-settings" class="tab-pane" role="tabpanel">
+        <h2 class="tab-title" data-i18n="settingsTitle">Ajustes y Respaldo</h2>
+
+        <div class="card settings-card">
+          <h3 class="card-title" data-i18n="dataManagementTitle">Gestión de Datos</h3>
+          <p class="card-desc" data-i18n="dataManagementDesc">Todos los datos se guardan en tu teléfono. Guarda una copia para no perder tu historial.</p>
+          
+          <div class="action-buttons-stack">
+            <button id="loadSampleDataBtn" class="btn-primary" style="background:#0284c7;">
+              ✨ <span data-i18n="loadSampleBtn">Cargar Datos de Ejemplo</span>
+            </button>
+            <button id="exportCsvBtn" class="btn-secondary">
+              📊 <span data-i18n="exportCsvBtn">Exportar a Excel (CSV)</span>
+            </button>
+            <button id="exportBackupBtn" class="btn-secondary">
+              💾 <span data-i18n="exportBackupBtn">Descargar Copia de Seguridad</span>
+            </button>
+            <label class="btn-secondary btn-file">
+              📂 <span data-i18n="importBackupBtn">Restaurar Copia de Seguridad</span>
+              <input type="file" id="importFileInput" accept=".json" style="display:none;">
+            </label>
+            <button id="clearAllDataBtn" class="btn-danger-outline">
+              🗑️ <span data-i18n="clearDataBtn">Borrar Todos los Datos</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- How to install on Android guide -->
+        <div class="card android-guide-card">
+          <h3 class="card-title">📲 <span data-i18n="installGuideTitle">Instalar en tu Android</span></h3>
+          <ol class="guide-steps">
+            <li data-i18n="guideStep1">Abre esta página en el navegador <strong>Google Chrome</strong> de tu teléfono.</li>
+            <li data-i18n="guideStep2">Toca el botón de tres puntos <strong>(⋮)</strong> en la esquina superior derecha.</li>
+            <li data-i18n="guideStep3">Selecciona <strong>"Agregar a pantalla principal"</strong> o <strong>"Instalar aplicación"</strong>.</li>
+            <li data-i18n="guideStep4">¡Listo! Se abrirá como una aplicación nativa completa con icono de auto.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar (Mobile Native Style) -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="tab-vehicle">
+        <span class="nav-icon">🚗</span>
+        <span class="nav-label" data-i18n="navVehicle">Vehículo</span>
+      </button>
+      <button class="nav-item" data-tab="tab-maintenance">
+        <span class="nav-icon">🛠️</span>
+        <span class="nav-label" data-i18n="navMaintenance">Servicios</span>
+      </button>
+      <button class="nav-item" data-tab="tab-fuel">
+        <span class="nav-icon">⛽</span>
+        <span class="nav-label" data-i18n="navFuel">Gasolina</span>
+      </button>
+      <button class="nav-item" data-tab="tab-settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label" data-i18n="navSettings">Ajustes</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: EDIT VEHICLE -->
+  <dialog id="vehicleModal" class="app-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3 class="dialog-title" data-i18n="editVehicleModalTitle">Información del Vehículo</h3>
+        <button type="button" class="close-dialog" data-close-modal="vehicleModal">&times;</button>
+      </div>
+      <form id="vehicleForm">
+        <div class="form-group">
+          <label for="carMakeInput" data-i18n="makeLabel">Marca</label>
+          <span class="input-hint" data-i18n="makeHint">Ej. Toyota, Ford, Honda</span>
+          <input type="text" id="carMakeInput" required placeholder="Toyota" autocomplete="organization">
+        </div>
+        <div class="form-group">
+          <label for="carModelInput" data-i18n="modelLabel">Modelo</label>
+          <span class="input-hint" data-i18n="modelHint">Ej. Corolla, Civic, F-150</span>
+          <input type="text" id="carModelInput" required placeholder="Corolla">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="carYearInput" data-i18n="yearLabel">Año</label>
+            <input type="number" id="carYearInput" required min="1950" max="2035" placeholder="2022" inputmode="numeric">
+          </div>
+          <div class="form-group col-half">
+            <label for="carMileageInput" data-i18n="mileageLabel">Millas Actuales</label>
+            <input type="number" id="carMileageInput" required min="0" placeholder="45000" inputmode="numeric">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="carVinInput">VIN / Número de Serie</label>
+          <span class="input-hint" data-i18n="vinHint">17 caracteres (en la tarjeta de registro o parabrisas)</span>
+          <input type="text" id="carVinInput" placeholder="1HGCR2F83HA..." maxlength="20" style="text-transform:uppercase;">
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn-cancel" data-close-modal="vehicleModal" data-i18n="cancelBtn">Cancelar</button>
+          <button type="submit" class="btn-primary" data-i18n="saveBtn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: ADD / EDIT MAINTENANCE -->
+  <dialog id="maintModal" class="app-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3 class="dialog-title" id="maintModalTitle" data-i18n="newServiceTitle">Registrar Servicio</h3>
+        <button type="button" class="close-dialog" data-close-modal="maintModal">&times;</button>
+      </div>
+      <form id="maintForm">
+        <input type="hidden" id="maintEditId" value="">
+        <div class="form-group">
+          <label for="maintType" data-i18n="serviceTypeLabel">Tipo de Servicio</label>
+          <select id="maintType" required>
+            <option value="oil" data-i18n="serviceOil">🛢️ Cambio de Aceite</option>
+            <option value="tires" data-i18n="serviceTires">🛞 Rotación / Cambio de Llantas</option>
+            <option value="brakes" data-i18n="serviceBrakes">🛑 Frenos (Pastillas / Discos)</option>
+            <option value="battery" data-i18n="serviceBattery">🔋 Batería</option>
+            <option value="filters" data-i18n="serviceFilters">💨 Filtro de Aire / Cabina</option>
+            <option value="general" data-i18n="serviceGeneral">🔧 Mantenimiento General / Afinación</option>
+            <option value="other" data-i18n="serviceOther">⚙️ Otro Servicio</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="maintDate" data-i18n="dateLabel">Fecha</label>
+            <input type="date" id="maintDate" required>
+          </div>
+          <div class="form-group col-half">
+            <label for="maintMileage" data-i18n="serviceMileageLabel">Millas al Realizar</label>
+            <input type="number" id="maintMileage" required min="0" placeholder="45200" inputmode="numeric">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="maintInterval" data-i18n="nextServiceIntervalLabel">Próximo en (+millas)</label>
+            <span class="input-hint" data-i18n="nextIntervalHint">Ej. 5000 para aceite</span>
+            <input type="number" id="maintInterval" min="0" step="500" placeholder="5000" inputmode="numeric">
+          </div>
+          <div class="form-group col-half">
+            <label for="maintCost" data-i18n="costLabel">Costo Total ($)</label>
+            <span class="input-hint" data-i18n="optionalHint">Opcional</span>
+            <input type="number" id="maintCost" min="0" step="0.01" placeholder="49.99" inputmode="decimal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="maintNotes" data-i18n="notesLabel">Notas / Taller</label>
+          <span class="input-hint" data-i18n="notesHint">Taller mecánico, tipo de aceite, etc.</span>
+          <textarea id="maintNotes" rows="2" placeholder="Sintético 0W-20, filtro nuevo..."></textarea>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn-cancel" data-close-modal="maintModal" data-i18n="cancelBtn">Cancelar</button>
+          <button type="submit" class="btn-primary" data-i18n="saveBtn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: ADD / EDIT FUEL -->
+  <dialog id="fuelModal" class="app-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3 class="dialog-title" id="fuelModalTitle" data-i18n="newFuelTitle">Cargar Gasolina</h3>
+        <button type="button" class="close-dialog" data-close-modal="fuelModal">&times;</button>
+      </div>
+      <form id="fuelForm">
+        <input type="hidden" id="fuelEditId" value="">
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="fuelDate" data-i18n="dateLabel">Fecha</label>
+            <input type="date" id="fuelDate" required>
+          </div>
+          <div class="form-group col-half">
+            <label for="fuelMileage" data-i18n="odometerLabel">Odómetro (Millas)</label>
+            <span class="input-hint" data-i18n="odometerHint">Lectura actual en el tablero</span>
+            <input type="number" id="fuelMileage" required min="0" placeholder="45380" inputmode="numeric">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="fuelGallons" data-i18n="gallonsLabel">Galones</label>
+            <span class="input-hint" data-i18n="gallonsHint">Ej. 11.45</span>
+            <input type="number" id="fuelGallons" required min="0.1" step="0.001" placeholder="11.4" inputmode="decimal">
+          </div>
+          <div class="form-group col-half">
+            <label for="fuelCost" data-i18n="totalCostLabel">Costo Total ($)</label>
+            <span class="input-hint" data-i18n="optionalHint">Opcional</span>
+            <input type="number" id="fuelCost" min="0" step="0.01" placeholder="38.50" inputmode="decimal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="fuelNotes" data-i18n="gasStationLabel">Gasolinera / Notas</label>
+          <input type="text" id="fuelNotes" placeholder="Shell, Chevron, tanque lleno...">
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn-cancel" data-close-modal="fuelModal" data-i18n="cancelBtn">Cancelar</button>
+          <button type="submit" class="btn-primary" data-i18n="saveBtn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

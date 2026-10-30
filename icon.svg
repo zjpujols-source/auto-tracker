@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+  <!-- Speedometer ring background -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="24"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#38bdf8" stroke-width="24" stroke-dasharray="800" stroke-dashoffset="250" stroke-linecap="round"/>
+  <!-- Car Silhouette -->
+  <path d="M140 310 L165 240 Q180 200 230 195 L310 195 Q345 195 365 240 L385 310 Q400 310 405 330 L405 365 Q405 375 390 375 L380 375 Q375 400 350 400 Q325 400 320 375 L200 375 Q195 400 170 400 Q145 400 140 375 L130 375 Q115 375 115 365 L115 330 Q120 310 140 310 Z" fill="url(#car)"/>
+  <!-- Wheels -->
+  <circle cx="170" cy="375" r="24" fill="#0f172a"/>
+  <circle cx="170" cy="375" r="12" fill="#94a3b8"/>
+  <circle cx="345" cy="375" r="24" fill="#0f172a"/>
+  <circle cx="345" cy="375" r="12" fill="#94a3b8"/>
+  <!-- Windows -->
+  <path d="M185 245 L200 215 Q210 210 240 210 L250 210 L250 250 L180 250 Z" fill="#0369a1"/>
+  <path d="M265 210 L315 210 Q335 210 345 240 L348 250 L265 250 Z" fill="#0369a1"/>
+  <!-- Wrench / Tool symbol small -->
+  <g transform="translate(330, 110) scale(0.65)">
+    <circle cx="60" cy="60" r="50" fill="#f59e0b"/>
+    <path d="M45 40 L75 70 M45 40 C40 35 30 35 25 40 C20 45 20 55 25 60 L35 70 L25 80 L35 90 L45 80 L55 90 C60 95 70 95 75 90 C80 85 80 75 75 70 Z" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Fuel pump nozzle symbol small -->
+  <g transform="translate(70, 110) scale(0.65)">
+    <circle cx="60" cy="60" r="50" fill="#10b981"/>
+    <rect x="42" y="35" width="36" height="50" rx="6" fill="#ffffff"/>
+    <rect x="48" y="42" width="24" height="20" rx="3" fill="#065f46"/>
+    <path d="M78 50 L90 50 L90 75 L80 85" stroke="#ffffff" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
